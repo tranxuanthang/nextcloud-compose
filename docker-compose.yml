@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  nextcloud:
+    image: nextcloud:fpm-alpine
+    restart: on-failure:5
+    volumes:
+      - nextcloud_data:/var/www/html
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_HOST=mariadb
+
+  mariadb:
+    image: mariadb
+    restart: on-failure:5
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+
+  caddy:
+    build:
+      context: ./caddy
+    restart: on-failure:5
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    volumes_from:
+      - nextcloud
+    environment:
+      - DOMAIN=${DOMAIN}
+
+volumes:
+  mariadb_data:
+  nextcloud_data:
+  caddy_data:
+  caddy_config:
+
