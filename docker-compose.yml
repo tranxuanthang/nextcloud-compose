@@ -33,8 +33,7 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
-    volumes_from:
-      - nextcloud
+      - nextcloud_data:/var/www/html:ro
     environment:
       - DOMAIN=${DOMAIN}
 
